@@ -2,9 +2,9 @@
 package mpd
 
 import (
-	"./xsd"
 	"bytes"
 	"encoding/xml"
+	"github.com/unki2aut/mpd/xsd"
 	"io"
 	"regexp"
 )
