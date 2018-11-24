@@ -17,18 +17,18 @@ var emptyElementRE = regexp.MustCompile(`></[A-Za-z]+>`)
 
 // MPD represents root XML element.
 type MPD struct {
-	XMLNS                      *string    `xml:"xmlns,attr"`
-	Type                       *string    `xml:"type,attr"`
-	MinimumUpdatePeriod        *string    `xml:"minimumUpdatePeriod,attr"`
-	AvailabilityStartTime      *string    `xml:"availabilityStartTime,attr"`
-	MediaPresentationDuration  *string    `xml:"mediaPresentationDuration,attr"`
-	MinBufferTime              *string    `xml:"minBufferTime,attr"`
-	SuggestedPresentationDelay *string    `xml:"suggestedPresentationDelay,attr"`
-	TimeShiftBufferDepth       *string    `xml:"timeShiftBufferDepth,attr"`
-	PublishTime                *string    `xml:"publishTime,attr"`
-	Profiles                   string     `xml:"profiles,attr"`
-	BaseURL                    []*BaseURL `xml:"BaseURL,omitempty"`
-	Period                     *Period    `xml:"Period,omitempty"`
+	XMLNS                      *string       `xml:"xmlns,attr"`
+	Type                       *string       `xml:"type,attr"`
+	MinimumUpdatePeriod        *xsd.Duration `xml:"minimumUpdatePeriod,attr"`
+	AvailabilityStartTime      *string       `xml:"availabilityStartTime,attr"`
+	MediaPresentationDuration  *string       `xml:"mediaPresentationDuration,attr"`
+	MinBufferTime              *xsd.Duration `xml:"minBufferTime,attr"`
+	SuggestedPresentationDelay *xsd.Duration `xml:"suggestedPresentationDelay,attr"`
+	TimeShiftBufferDepth       *xsd.Duration `xml:"timeShiftBufferDepth,attr"`
+	PublishTime                *string       `xml:"publishTime,attr"`
+	Profiles                   string        `xml:"profiles,attr"`
+	BaseURL                    []*BaseURL    `xml:"BaseURL,omitempty"`
+	Period                     *Period       `xml:"Period,omitempty"`
 }
 
 // Do not try to use encoding.TextMarshaler and encoding.TextUnmarshaler:
@@ -72,9 +72,9 @@ func (m *MPD) Decode(b []byte) error {
 
 // Period represents XSD's PeriodType.
 type Period struct {
-	Start          *string          `xml:"start,attr"`
+	Start          *xsd.Duration    `xml:"start,attr"`
 	ID             *string          `xml:"id,attr"`
-	Duration       *string          `xml:"duration,attr"`
+	Duration       *xsd.Duration    `xml:"duration,attr"`
 	AdaptationSets []*AdaptationSet `xml:"AdaptationSet,omitempty"`
 	BaseURL        []*BaseURL       `xml:"BaseURL,omitempty"`
 }
