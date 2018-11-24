@@ -1,4 +1,4 @@
-package mpd
+package xsd
 
 import (
 	"encoding/xml"
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-type XSDDuration time.Duration
+type Duration time.Duration
 
 var (
 	pattern = regexp.MustCompile(`(?P<sign>-)?P((?P<Y>\d+)Y)?((?P<M>\d+)M)?((?P<D>\d+)D)?(T((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)(?P<ms>\.\d+)?S)?)?`)
@@ -18,11 +18,11 @@ var (
 	errNoMonth         = errors.New("non-zero value for months is not allowed")
 )
 
-func (d XSDDuration) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
+func (d Duration) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
 	return xml.Attr{Name: name, Value: d.String()}, nil
 }
 
-func (d XSDDuration) String() string {
+func (d Duration) String() string {
 	var buf [32]byte
 	w := len(buf)
 
@@ -136,12 +136,12 @@ func fmtInt(buf []byte, v uint64) int {
 	return w
 }
 
-func XSDDurationFromString(str string) (*XSDDuration, error) {
+func DurationFromString(str string) (*Duration, error) {
 	var (
 		match        []string
-		dur          = XSDDuration(0)
-		Sign         = XSDDuration(1)
-		MSec         = XSDDuration(1000000)
+		dur          = Duration(0)
+		Sign         = Duration(1)
+		MSec         = Duration(1000000)
 		Sec          = 1000 * MSec
 		Hour         = 3600 * Sec
 		Day          = 24 * Hour
@@ -174,7 +174,7 @@ func XSDDurationFromString(str string) (*XSDDuration, error) {
 				return nil, err
 			}
 
-			dur += XSDDuration(val * 1000000000)
+			dur += Duration(val * 1000000000)
 			continue
 		}
 
@@ -185,19 +185,19 @@ func XSDDurationFromString(str string) (*XSDDuration, error) {
 
 		switch name {
 		case "Y":
-			dur += XSDDuration(val) * Year
+			dur += Duration(val) * Year
 		case "M":
 			if val != 0 {
 				return nil, errNoMonth
 			}
 		case "D":
-			dur += XSDDuration(val) * Day
+			dur += Duration(val) * Day
 		case "h":
-			dur += XSDDuration(val) * Hour
+			dur += Duration(val) * Hour
 		case "m":
-			dur += XSDDuration(val) * 60 * Sec
+			dur += Duration(val) * 60 * Sec
 		case "s":
-			dur += XSDDuration(val) * Sec
+			dur += Duration(val) * Sec
 		default:
 			return nil, errors.New(fmt.Sprintf("unknown field %s", name))
 		}
@@ -212,8 +212,8 @@ func XSDDurationFromString(str string) (*XSDDuration, error) {
 	return &dur, nil
 }
 
-func (d *XSDDuration) UnmarshalXMLAttr(attr xml.Attr) error {
-	dur, err := XSDDurationFromString(attr.Value)
+func (d *Duration) UnmarshalXMLAttr(attr xml.Attr) error {
+	dur, err := DurationFromString(attr.Value)
 	if err != nil {
 		return err
 	}
@@ -221,3 +221,10 @@ func (d *XSDDuration) UnmarshalXMLAttr(attr xml.Attr) error {
 	*d = *dur
 	return nil
 }
+
+// check interfaces
+var (
+	dur                     = Duration(0)
+	_   xml.MarshalerAttr   = dur
+	_   xml.UnmarshalerAttr = &dur
+)
