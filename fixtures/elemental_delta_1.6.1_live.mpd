@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" type="dynamic" minimumUpdatePeriod="PT10S" availabilityStartTime="2015-09-07T05:45:54" minBufferTime="PT30S" suggestedPresentationDelay="PT25.00S" timeShiftBufferDepth="PT56.50S" profiles="urn:mpeg:dash:profile:isoff-live:2011">
-  <Period start="PT0.00S" id="1">
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" type="dynamic" minimumUpdatePeriod="PT10S" availabilityStartTime="2015-09-07T05:45:54" minBufferTime="PT30S" suggestedPresentationDelay="PT25S" timeShiftBufferDepth="PT56.5S" profiles="urn:mpeg:dash:profile:isoff-live:2011">
+  <Period start="PT0S" id="1">
     <AdaptationSet mimeType="video/mp4" segmentAlignment="true" subsegmentAlignment="true" startWithSAP="1" subsegmentStartsWithSAP="1" bitstreamSwitching="true">
       <ContentProtection schemeIdUri="urn:mpeg:dash:mp4protection:2011" value="cenc"/>
       <ContentProtection schemeIdUri="urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed"/>
