@@ -18,7 +18,10 @@ var (
 	errNoMonth         = errors.New("non-zero value for months is not allowed")
 )
 
-func (d Duration) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
+func (d *Duration) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
+	if d == nil {
+		return xml.Attr{}, nil
+	}
 	return xml.Attr{Name: name, Value: d.String()}, nil
 }
 
@@ -225,6 +228,6 @@ func (d *Duration) UnmarshalXMLAttr(attr xml.Attr) error {
 // check interfaces
 var (
 	dur                     = Duration(0)
-	_   xml.MarshalerAttr   = dur
+	_   xml.MarshalerAttr   = &dur
 	_   xml.UnmarshalerAttr = &dur
 )
