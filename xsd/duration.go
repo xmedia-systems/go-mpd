@@ -142,9 +142,9 @@ func fmtInt(buf []byte, v uint64) int {
 func DurationFromString(str string) (*Duration, error) {
 	var (
 		match        []string
-		dur          = Duration(0)
-		Sign         = Duration(1)
-		MSec         = Duration(1000000)
+		dur          = int64(0)
+		Sign         = int64(1)
+		MSec         = int64(1000000)
 		Sec          = 1000 * MSec
 		Hour         = 3600 * Sec
 		Day          = 24 * Hour
@@ -177,7 +177,7 @@ func DurationFromString(str string) (*Duration, error) {
 				return nil, err
 			}
 
-			dur += Duration(val * 1000000000)
+			dur += int64(val * 1000000000)
 			continue
 		}
 
@@ -188,19 +188,19 @@ func DurationFromString(str string) (*Duration, error) {
 
 		switch name {
 		case "Y":
-			dur += Duration(val) * Year
+			dur += val * Year
 		case "M":
 			if val != 0 {
 				return nil, errNoMonth
 			}
 		case "D":
-			dur += Duration(val) * Day
+			dur += val * Day
 		case "h":
-			dur += Duration(val) * Hour
+			dur += val * Hour
 		case "m":
-			dur += Duration(val) * 60 * Sec
+			dur += val * 60 * Sec
 		case "s":
-			dur += Duration(val) * Sec
+			dur += val * Sec
 		default:
 			return nil, errors.New(fmt.Sprintf("unknown field %s", name))
 		}
@@ -212,7 +212,7 @@ func DurationFromString(str string) (*Duration, error) {
 
 	dur *= Sign
 
-	return &dur, nil
+	return (*Duration)(&dur), nil
 }
 
 func (d *Duration) UnmarshalXMLAttr(attr xml.Attr) error {
