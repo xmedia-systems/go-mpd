@@ -4,6 +4,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"time"
@@ -139,7 +140,7 @@ func fmtInt(buf []byte, v uint64) int {
 	return w
 }
 
-func DurationFromString(str string) (*Duration, error) {
+func DurationFromString2(str string) (*Duration, error) {
 	var (
 		match        []string
 		dur          = int64(0)
@@ -213,6 +214,155 @@ func DurationFromString(str string) (*Duration, error) {
 	dur *= Sign
 
 	return (*Duration)(&dur), nil
+}
+
+// The implementation of DurationFromString2 was done with a Regex so this of course has
+// an impact on performance. Inspired by String() I tried to write the parser by hand and
+// on my local machine the benchmark shows quite a significant difference.
+// I also wanted to try the benchmarking out.
+//
+// BenchmarkDurationFromString-8    	 5000000	       241 ns/op
+// BenchmarkDurationFromString2-8   	 1000000	      1924 ns/op
+func DurationFromString(str string) (*Duration, error) {
+	var (
+		dur = int64(0)
+		buf = []byte(str)
+		c   = len(buf) - 1
+
+		msec = int64(1000000)
+		sec  = 1000 * msec
+		hour = 3600 * sec
+		day  = 24 * hour
+		year = 365 * day
+
+		timeParsed = false
+	)
+
+	parsePartial := func(indicator byte, multiplier int64) error {
+		if buf[c] != indicator {
+			return nil
+		}
+
+		c--
+
+		i := lookupInt(&buf, c)
+		if i == c+1 {
+			return nil
+		}
+
+		val, err := atoi(buf[i : c+1])
+		if err != nil {
+			return err
+		}
+
+		dur += val * multiplier
+		c = i - 1
+
+		timeParsed = true
+
+		return nil
+	}
+
+	if buf[c] == 'S' {
+		c--
+		s := lookupInt(&buf, c)
+		if s == c+1 {
+			return nil, invalidFormatError
+		}
+
+		if buf[s-1] == '.' {
+			nsVal, err := atoi(buf[s : c+1])
+			if err != nil {
+				return nil, err
+			}
+			remainingZeroes := 8 - (c - s)
+			dur += nsVal * int64(math.Pow10(remainingZeroes))
+			c = s - 2
+
+			s = lookupInt(&buf, c)
+
+			if s == c+1 {
+				return nil, invalidFormatError
+			}
+		}
+
+		sVal, err := atoi(buf[s : c+1])
+		if err != nil {
+			return nil, err
+		}
+		dur += sec * sVal
+		c = s - 1
+
+		timeParsed = true
+	}
+
+	if err := parsePartial('M', 60*sec); err != nil {
+		return nil, err
+	}
+
+	if err := parsePartial('H', hour); err != nil {
+		return nil, err
+	}
+
+	if timeParsed {
+		if buf[c] != 'T' {
+			return nil, invalidFormatError
+		}
+
+		c--
+	}
+
+	if err := parsePartial('D', day); err != nil {
+		return nil, err
+	}
+
+	if buf[c] == 'M' && buf[c+1] != '0' {
+		return nil, errNoMonth
+	}
+
+	if err := parsePartial('Y', year); err != nil {
+		return nil, err
+	}
+
+	if buf[c] == 'P' {
+		if c == 1 && buf[c-1] == '-' {
+			dur *= -1
+		} else if c != 0 {
+			return nil, invalidFormatError
+		}
+	} else {
+		return nil, invalidFormatError
+	}
+
+	return (*Duration)(&dur), nil
+}
+
+func atoi(buf []byte) (x int64, err error) {
+	for i := 0; i < len(buf); i++ {
+		c := buf[i]
+		if x > (1<<63-1)/10 {
+			// overflow
+			return 0, invalidFormatError
+		}
+		x = x*10 + int64(c) - '0'
+		if x < 0 {
+			// overflow
+			return 0, invalidFormatError
+		}
+	}
+
+	return x, err
+}
+
+func lookupInt(buf *[]byte, i int) int {
+	for ; i >= 0; i-- {
+		c := (*buf)[i]
+		if c < '0' || c > '9' {
+			return i + 1
+		}
+	}
+
+	return i
 }
 
 func (d *Duration) UnmarshalXMLAttr(attr xml.Attr) error {
