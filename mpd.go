@@ -4,10 +4,9 @@ package mpd
 import (
 	"bytes"
 	"encoding/xml"
-	"fmt"
+	"github.com/unki2aut/mpd/xsd"
 	"io"
 	"regexp"
-	"strconv"
 )
 
 // http://mpeg.chiariglione.org/standards/mpeg-dash
@@ -16,63 +15,20 @@ import (
 
 var emptyElementRE = regexp.MustCompile(`></[A-Za-z]+>`)
 
-// ConditionalUint (ConditionalUintType) defined in XSD as a union of unsignedInt and boolean.
-type ConditionalUint struct {
-	u *uint64
-	b *bool
-}
-
-// MarshalXMLAttr encodes ConditionalUint.
-func (c ConditionalUint) MarshalXMLAttr(name xml.Name) (xml.Attr, error) {
-	if c.u != nil {
-		return xml.Attr{Name: name, Value: strconv.FormatUint(*c.u, 10)}, nil
-	}
-
-	if c.b != nil {
-		return xml.Attr{Name: name, Value: strconv.FormatBool(*c.b)}, nil
-	}
-
-	// both are nil - no attribute, client will threat it like "false"
-	return xml.Attr{}, nil
-}
-
-// UnmarshalXMLAttr decodes ConditionalUint.
-func (c *ConditionalUint) UnmarshalXMLAttr(attr xml.Attr) error {
-	u, err := strconv.ParseUint(attr.Value, 10, 64)
-	if err == nil {
-		c.u = &u
-		return nil
-	}
-
-	b, err := strconv.ParseBool(attr.Value)
-	if err == nil {
-		c.b = &b
-		return nil
-	}
-
-	return fmt.Errorf("ConditionalUint: can't UnmarshalXMLAttr %#v", attr)
-}
-
-// check interfaces
-var (
-	_ xml.MarshalerAttr   = ConditionalUint{}
-	_ xml.UnmarshalerAttr = &ConditionalUint{}
-)
-
 // MPD represents root XML element.
 type MPD struct {
-	XMLNS                      *string    `xml:"xmlns,attr"`
-	Type                       *string    `xml:"type,attr"`
-	MinimumUpdatePeriod        *string    `xml:"minimumUpdatePeriod,attr"`
-	AvailabilityStartTime      *string    `xml:"availabilityStartTime,attr"`
-	MediaPresentationDuration  *string    `xml:"mediaPresentationDuration,attr"`
-	MinBufferTime              *string    `xml:"minBufferTime,attr"`
-	SuggestedPresentationDelay *string    `xml:"suggestedPresentationDelay,attr"`
-	TimeShiftBufferDepth       *string    `xml:"timeShiftBufferDepth,attr"`
-	PublishTime                *string    `xml:"publishTime,attr"`
-	Profiles                   string     `xml:"profiles,attr"`
-	BaseURL                    []*BaseURL `xml:"BaseURL,omitempty"`
-	Period                     *Period    `xml:"Period,omitempty"`
+	XMLNS                      *string       `xml:"xmlns,attr"`
+	Type                       *string       `xml:"type,attr"`
+	MinimumUpdatePeriod        *xsd.Duration `xml:"minimumUpdatePeriod,attr"`
+	AvailabilityStartTime      *string       `xml:"availabilityStartTime,attr"`
+	MediaPresentationDuration  *string       `xml:"mediaPresentationDuration,attr"`
+	MinBufferTime              *xsd.Duration `xml:"minBufferTime,attr"`
+	SuggestedPresentationDelay *xsd.Duration `xml:"suggestedPresentationDelay,attr"`
+	TimeShiftBufferDepth       *xsd.Duration `xml:"timeShiftBufferDepth,attr"`
+	PublishTime                *string       `xml:"publishTime,attr"`
+	Profiles                   string        `xml:"profiles,attr"`
+	BaseURL                    []*BaseURL    `xml:"BaseURL,omitempty"`
+	Period                     *Period       `xml:"Period,omitempty"`
 }
 
 // Do not try to use encoding.TextMarshaler and encoding.TextUnmarshaler:
@@ -116,9 +72,9 @@ func (m *MPD) Decode(b []byte) error {
 
 // Period represents XSD's PeriodType.
 type Period struct {
-	Start          *string          `xml:"start,attr"`
+	Start          *xsd.Duration    `xml:"start,attr"`
 	ID             *string          `xml:"id,attr"`
-	Duration       *string          `xml:"duration,attr"`
+	Duration       *xsd.Duration    `xml:"duration,attr"`
 	AdaptationSets []*AdaptationSet `xml:"AdaptationSet,omitempty"`
 	BaseURL        []*BaseURL       `xml:"BaseURL,omitempty"`
 }
@@ -134,19 +90,19 @@ type BaseURL struct {
 
 // AdaptationSet represents XSD's AdaptationSetType.
 type AdaptationSet struct {
-	MimeType                string           `xml:"mimeType,attr"`
-	ContentType             *string          `xml:"contentType,attr"`
-	SegmentAlignment        ConditionalUint  `xml:"segmentAlignment,attr"`
-	SubsegmentAlignment     ConditionalUint  `xml:"subsegmentAlignment,attr"`
-	StartWithSAP            *uint64          `xml:"startWithSAP,attr"`
-	SubsegmentStartsWithSAP *uint64          `xml:"subsegmentStartsWithSAP,attr"`
-	BitstreamSwitching      *bool            `xml:"bitstreamSwitching,attr"`
-	Lang                    *string          `xml:"lang,attr"`
-	Par                     *string          `xml:"par,attr"`
-	BaseURL                 []*BaseURL       `xml:"BaseURL,omitempty"`
-	SegmentTemplate         *SegmentTemplate `xml:"SegmentTemplate,omitempty"`
-	ContentProtections      []Descriptor     `xml:"ContentProtection,omitempty"`
-	Representations         []Representation `xml:"Representation,omitempty"`
+	MimeType                string              `xml:"mimeType,attr"`
+	ContentType             *string             `xml:"contentType,attr"`
+	SegmentAlignment        xsd.ConditionalUint `xml:"segmentAlignment,attr"`
+	SubsegmentAlignment     xsd.ConditionalUint `xml:"subsegmentAlignment,attr"`
+	StartWithSAP            *uint64             `xml:"startWithSAP,attr"`
+	SubsegmentStartsWithSAP *uint64             `xml:"subsegmentStartsWithSAP,attr"`
+	BitstreamSwitching      *bool               `xml:"bitstreamSwitching,attr"`
+	Lang                    *string             `xml:"lang,attr"`
+	Par                     *string             `xml:"par,attr"`
+	BaseURL                 []*BaseURL          `xml:"BaseURL,omitempty"`
+	SegmentTemplate         *SegmentTemplate    `xml:"SegmentTemplate,omitempty"`
+	ContentProtections      []Descriptor        `xml:"ContentProtection,omitempty"`
+	Representations         []Representation    `xml:"Representation,omitempty"`
 }
 
 // Representation represents XSD's RepresentationType.

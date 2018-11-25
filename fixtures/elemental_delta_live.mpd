@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" type="dynamic" minimumUpdatePeriod="PT10S" availabilityStartTime="2015-09-02T13:46:49" minBufferTime="PT30S" suggestedPresentationDelay="PT96.00S" timeShiftBufferDepth="PT32.50S" profiles="urn:mpeg:dash:profile:isoff-live:2011">
-  <Period start="PT0.00S" id="1">
+<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" type="dynamic" minimumUpdatePeriod="PT10S" availabilityStartTime="2015-09-02T13:46:49" minBufferTime="PT30S" suggestedPresentationDelay="PT1M36S" timeShiftBufferDepth="PT32.5S" profiles="urn:mpeg:dash:profile:isoff-live:2011">
+  <Period start="PT0S" id="1">
     <AdaptationSet mimeType="video/mp4" segmentAlignment="true" subsegmentAlignment="true" startWithSAP="1" subsegmentStartsWithSAP="1" bitstreamSwitching="true">
       <Representation id="1" width="320" height="240" frameRate="25/1" bandwidth="208902" codecs="avc1.4D401F">
         <SegmentTemplate timescale="90000" media="1119_video_1_0_$Number$.mp4?m=1441211833" initialization="1119_video_1_0_init.mp4?m=1441211833" startNumber="1824">
