@@ -12,7 +12,7 @@ import (
 type Duration time.Duration
 
 var (
-	pattern = regexp.MustCompile(`(?P<sign>-)?P((?P<Y>\d+)Y)?((?P<M>\d+)M)?((?P<D>\d+)D)?(T((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)(?P<ms>\.\d+)?S)?)?`)
+	pattern = regexp.MustCompile(`^(?P<sign>-)?P((?P<Y>\d+)Y)?((?P<M>\d+)M)?((?P<D>\d+)D)?(T((?P<h>\d+)H)?((?P<m>\d+)M)?((?P<s>\d+)(?P<ms>\.\d+)?S)?)?$`)
 
 	invalidFormatError = errors.New("format of string no valid duration")
 	errNoMonth         = errors.New("non-zero value for months is not allowed")
