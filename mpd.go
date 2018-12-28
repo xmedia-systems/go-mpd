@@ -4,7 +4,7 @@ package mpd
 import (
 	"bytes"
 	"encoding/xml"
-	"github.com/unki2aut/mpd/xsd"
+	"github.com/unki2aut/go-xsd-types"
 	"io"
 	"regexp"
 )
