@@ -1,4 +1,4 @@
-package xsd
+package mpd
 
 import (
 	"encoding/xml"
