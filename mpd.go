@@ -99,6 +99,8 @@ type AdaptationSet struct {
 	BitstreamSwitching      *bool            `xml:"bitstreamSwitching,attr"`
 	Lang                    *string          `xml:"lang,attr"`
 	Par                     *string          `xml:"par,attr"`
+	Codecs                  *string          `xml:"codecs,attr"`
+	Role                    []*Descriptor    `xml:"Role,omitempty"`
 	BaseURL                 []*BaseURL       `xml:"BaseURL,omitempty"`
 	SegmentTemplate         *SegmentTemplate `xml:"SegmentTemplate,omitempty"`
 	ContentProtections      []Descriptor     `xml:"ContentProtection,omitempty"`
