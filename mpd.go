@@ -20,12 +20,13 @@ type MPD struct {
 	XMLNS                      *string       `xml:"xmlns,attr"`
 	Type                       *string       `xml:"type,attr"`
 	MinimumUpdatePeriod        *xsd.Duration `xml:"minimumUpdatePeriod,attr"`
-	AvailabilityStartTime      *string       `xml:"availabilityStartTime,attr"`
-	MediaPresentationDuration  *string       `xml:"mediaPresentationDuration,attr"`
+	AvailabilityStartTime      *xsd.DateTime `xml:"availabilityStartTime,attr"`
+	AvailabilityEndTime        *xsd.DateTime `xml:"availabilityEndTime,attr"`
+	MediaPresentationDuration  *xsd.Duration `xml:"mediaPresentationDuration,attr"`
 	MinBufferTime              *xsd.Duration `xml:"minBufferTime,attr"`
 	SuggestedPresentationDelay *xsd.Duration `xml:"suggestedPresentationDelay,attr"`
 	TimeShiftBufferDepth       *xsd.Duration `xml:"timeShiftBufferDepth,attr"`
-	PublishTime                *string       `xml:"publishTime,attr"`
+	PublishTime                *xsd.DateTime `xml:"publishTime,attr"`
 	Profiles                   string        `xml:"profiles,attr"`
 	BaseURL                    []*BaseURL    `xml:"BaseURL,omitempty"`
 	Period                     *Period       `xml:"Period,omitempty"`
