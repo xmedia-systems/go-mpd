@@ -141,6 +141,7 @@ type SegmentTemplate struct {
 	SegmentTimeline        *SegmentTimeline `xml:"SegmentTimeline,omitempty"`
 }
 
+// SegmentTimeline represents XSD's SegmentTimelineType.
 type SegmentTimeline struct {
 	S []*SegmentTimelineS `xml:"S"`
 }
