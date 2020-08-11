@@ -29,7 +29,7 @@ type MPD struct {
 	PublishTime                *xsd.DateTime `xml:"publishTime,attr"`
 	Profiles                   string        `xml:"profiles,attr"`
 	BaseURL                    []*BaseURL    `xml:"BaseURL,omitempty"`
-	Period                     *Period       `xml:"Period,omitempty"`
+	Period                     []*Period     `xml:"Period,omitempty"`
 }
 
 // Do not try to use encoding.TextMarshaler and encoding.TextUnmarshaler:
