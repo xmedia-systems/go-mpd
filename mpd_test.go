@@ -79,3 +79,29 @@ func (s *MPDSuite) TestUnmarshalMarshalLiveDelta161(c *C) {
 func (s *MPDSuite) TestUnmarshalMarshalSegmentTemplate(c *C) {
 	testUnmarshalMarshalAkamai(c, "fixtures/akamai_bbb_30fps.mpd")
 }
+
+func Uint64Pointer(val uint64) *uint64 {
+	return &val
+}
+
+func (s *MPDSuite) TestToSegmentEntries(c *C) {
+	s1 := SegmentTimelineS{T: Uint64Pointer(0), D: 1000, R: Uint64Pointer(2)}
+	s2 := SegmentTimelineS{D: 2000, R: Uint64Pointer(1)}
+	segmentTimeline := SegmentTimeline{S: []*SegmentTimelineS{&s1, &s2}}
+	expected := []SegmentEntry{{T: 0, D: 1000}, {T: 1000, D: 1000}, {T: 2000, D: 1000}, {T: 3000, D: 2000}, {T: 5000, D: 2000}}
+	actual, err := segmentTimeline.toSegmentEntries()
+
+	c.Assert(err, Equals, nil)
+	c.Assert(actual, DeepEquals, expected)
+}
+
+func (s *MPDSuite) TestReduceSegmentEntries(c *C) {
+	list := []SegmentEntry{{T: 0, D: 1000}, {T: 1000, D: 1000}, {T: 2000, D: 1000}, {T: 3000, D: 2000}, {T: 5000, D: 2000}}
+	s1 := SegmentTimelineS{T: Uint64Pointer(0), D: 1000, R: Uint64Pointer(2)}
+	s2 := SegmentTimelineS{D: 2000, R: Uint64Pointer(1)}
+	expected := []*SegmentTimelineS{&s1, &s2}
+
+	actual := reduceSegmentEntries(list)
+
+	c.Assert(actual, DeepEquals, expected)
+}

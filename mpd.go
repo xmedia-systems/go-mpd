@@ -4,6 +4,7 @@ package mpd
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"github.com/unki2aut/go-xsd-types"
 	"io"
 	"regexp"
@@ -150,5 +151,75 @@ type SegmentTimeline struct {
 type SegmentTimelineS struct {
 	T *uint64 `xml:"t,attr"`
 	D uint64  `xml:"d,attr"`
-	R *int64  `xml:"r,attr"`
+	R *uint64 `xml:"r,attr"`
+}
+
+type SegmentEntry struct {
+	T uint64
+	D uint64
+}
+
+func (st *SegmentTimeline) toSegmentEntries() ([]SegmentEntry, error) {
+	if len(st.S) == 0 || st.S[0].T == nil {
+		return nil, errors.New("first element of SegmentTimeline doesn't contain a `T` property")
+	}
+
+	var result []SegmentEntry
+	var t uint64
+	for _, s := range st.S {
+		if s.T != nil {
+			t = *s.T
+		}
+		var r = int32(0)
+		if s.R != nil {
+			r = int32(*s.R)
+		}
+		for ; r >= 0; r-- {
+			result = append(result, SegmentEntry{T: t, D: s.D})
+			t += s.D
+		}
+	}
+
+	return result, nil
+}
+
+func reduceSegmentEntries(entries []SegmentEntry) []*SegmentTimelineS {
+	var timeline []*SegmentTimelineS
+	var currentS = &SegmentTimelineS{T: &entries[0].T, D: entries[0].D}
+	var t = entries[0].T
+	var r = uint64(0)
+
+	for _, entry := range entries[1:] {
+		if entry.T == t+currentS.D {
+			t += currentS.D
+
+			if entry.D == currentS.D {
+				r++
+
+				if entry == entries[len(entries)-1] {
+					timeline = appendToTimeline(timeline, currentS, r)
+					r = 0
+				}
+			} else {
+				timeline = appendToTimeline(timeline, currentS, r)
+
+				r = 0
+				currentS = &SegmentTimelineS{D: entry.D}
+			}
+		} else {
+			timeline = append(timeline, currentS)
+
+			t = entry.T
+			r = 0
+			currentS = &SegmentTimelineS{T: &entry.T, D: entry.D}
+		}
+	}
+
+	return timeline
+}
+
+func appendToTimeline(timeline []*SegmentTimelineS, current *SegmentTimelineS, repeat uint64) []*SegmentTimelineS {
+	current.R = &repeat
+	timeline = append(timeline, current)
+	return timeline
 }
