@@ -138,6 +138,8 @@ type SegmentTemplate struct {
 	Initialization         *string          `xml:"initialization,attr"`
 	StartNumber            *uint64          `xml:"startNumber,attr"`
 	PresentationTimeOffset *uint64          `xml:"presentationTimeOffset,attr"`
+	AvailabilityTimeOffset   *float32         `xml:"availabilityTimeOffset,attr,omitempty"`
+	AvailabilityTimeComplete *bool            `xml:"availabilityTimeComplete,attr,omitempty"`
 	SegmentTimeline        *SegmentTimeline `xml:"SegmentTimeline,omitempty"`
 }
 
